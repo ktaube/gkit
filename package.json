@@ -3,12 +3,17 @@
   "module": "index.ts",
   "type": "module",
   "bin": {
-    "gkit": "./index.ts"
+    "gkit": "./index.tsx"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/react": "^18.3.1"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "ink": "^4.4.1",
+    "react": "^18.3.1"
   }
 }
