@@ -1,28 +1,20 @@
 #! /usr/bin/env bun
 
-import { $ } from "bun";
-import React, { useState, useEffect } from "react";
-import { render, Text } from "ink";
+import { Text, render } from "ink";
 
-const { stderr, stdout } = await $`git --version`.nothrow().quiet();
+import Groq from "groq-sdk";
 
-console.log("stdout", stdout.toString());
-console.log("stderr", stderr.toString());
+const groq = new Groq();
 
-const Counter = () => {
-  const [counter, setCounter] = useState(0);
+const chatCompletion = await groq.chat.completions.create({
+  messages: [
+    { role: "user", content: "Explain the importance of low latency LLMs" },
+  ],
+  model: "mixtral-8x7b-32768",
+});
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCounter((previousCounter) => previousCounter + 1);
-    }, 100);
-
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
-
-  return <Text color="green">{counter} tests passed</Text>;
+const App = () => {
+  return <Text color="green">{chatCompletion.choices[0].message.content}</Text>;
 };
 
-render(<Counter />);
+render(<App />);
