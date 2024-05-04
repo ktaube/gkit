@@ -5,6 +5,10 @@
   "bin": {
     "gkit": "./index.tsx"
   },
+  "scripts": {
+    "db:migrate": "bun run scripts/migrate.ts",
+    "db:seed": "bun run scripts/seed.ts"
+  },
   "devDependencies": {
     "@types/bun": "latest",
     "@types/react": "^18.3.1",
