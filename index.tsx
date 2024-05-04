@@ -2,8 +2,15 @@
 
 import { Box, Text, render } from "ink";
 
+import { db } from "./db";
+import { sql } from "drizzle-orm";
+
 import Groq from "groq-sdk";
 import { $ } from "bun";
+
+const query = sql`select "hello world" as text`;
+const result = db.get<{ text: string }>(query);
+console.log(result);
 
 const groq = new Groq();
 
@@ -17,7 +24,7 @@ You have access to "git status" and "git diff" outputs.
 Describe the changes in bulletpoints.
 Look at the changes as a whole. Figure out *why* the changes are implemented.
 
-Format: 
+Format:
 <emoji that best describes the change> <description of change>
 <emoji that best describes the change> <fun fact about one of the used methods from a known library>
 
