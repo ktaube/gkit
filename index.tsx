@@ -3,15 +3,13 @@
 import { Box, Text, render } from "ink";
 
 import { db } from "./db";
-import { sql } from "drizzle-orm";
 
 import Groq from "groq-sdk";
 import { $ } from "bun";
+import { schema } from "./schema";
 
-const query = sql`select "hello world" as text`;
-const result = db.get<{ text: string }>(query);
+const result = await db.select().from(schema.movies);
 console.log(result);
-
 const groq = new Groq();
 
 const gitStatus = await $`git status`.quiet().text();

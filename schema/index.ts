@@ -5,3 +5,7 @@ export const movies = sqliteTable("movies", {
   title: text("name"),
   releaseYear: integer("release_year"),
 });
+
+export const schema = {
+  movies,
+}
