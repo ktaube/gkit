@@ -2,13 +2,9 @@
 
 import { Box, Text, render } from "ink";
 
-import { db } from "./db";
-
 import Groq from "groq-sdk";
 import { $ } from "bun";
-import { schema } from "./schema";
 
-const result = await db.select().from(schema.movies);
 const groq = new Groq();
 
 const gitStatus = await $`git status`.quiet().text();
