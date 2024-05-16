@@ -1,8 +1,5 @@
 package main
 
-// A simple program that opens the alternate screen buffer then counts down
-// from 5 and then exits.
-
 import (
 	"fmt"
 	"log"
@@ -13,13 +10,23 @@ import (
 
 type model int
 
-type tickMsg time.Time
+type tickMsg string
 
 func main() {
 	p := tea.NewProgram(model(5), tea.WithAltScreen())
 	if _, err := p.Run(); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func tick() tea.Cmd {
+	return tea.Tick(time.Second, func(t time.Time) tea.Msg {
+		status, err := runGitStatus()
+		if err != nil {
+			log.Fatal(err)
+		}
+		return tickMsg(status)
+	})
 }
 
 func (m model) Init() tea.Cmd {
@@ -35,10 +42,6 @@ func (m model) Update(message tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case tickMsg:
-		m--
-		if m <= 0 {
-			return m, tea.Quit
-		}
 		return m, tick()
 	}
 
@@ -46,11 +49,5 @@ func (m model) Update(message tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	return fmt.Sprintf("\n\n     Hi. This program will exit in %d seconds...", m)
-}
-
-func tick() tea.Cmd {
-	return tea.Tick(time.Second, func(t time.Time) tea.Msg {
-		return tickMsg(t)
-	})
+	return fmt.Sprint("\n\n     Hi. This this is git status\n", m)
 }
