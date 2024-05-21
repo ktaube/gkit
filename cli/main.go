@@ -6,6 +6,7 @@ import (
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 type model struct {
@@ -57,5 +58,10 @@ func (m model) Update(message tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	return fmt.Sprint("", m.git.status, "\n", m.git.statusTs.Format(time.ANSIC))
+	var style = lipgloss.NewStyle().
+		PaddingTop(2).
+		PaddingLeft(4).
+		Width(120)
+
+	return style.Render(fmt.Sprint("", m.git.status, "\n", m.git.statusTs.Format(time.ANSIC)))
 }
