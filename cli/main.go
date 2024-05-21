@@ -8,29 +8,37 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type model int
-
+type model struct {
+	git *git
+}
 type tickMsg string
 
 func main() {
-	p := tea.NewProgram(model(5), tea.WithAltScreen())
+
+	git := git{}
+
+	_, err := git.runGitStatus()
+	if err != nil {
+		log.Fatal(err)
+	}
+	p := tea.NewProgram(model{git: &git}, tea.WithAltScreen())
 	if _, err := p.Run(); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func tick() tea.Cmd {
+func (m model) tick() tea.Cmd {
 	return tea.Tick(time.Second, func(t time.Time) tea.Msg {
-		status, err := runGitStatus()
+		_, err := m.git.runGitStatus()
 		if err != nil {
 			log.Fatal(err)
 		}
-		return tickMsg(status)
+		return tickMsg("")
 	})
 }
 
 func (m model) Init() tea.Cmd {
-	return tick()
+	return m.tick()
 }
 
 func (m model) Update(message tea.Msg) (tea.Model, tea.Cmd) {
@@ -42,12 +50,12 @@ func (m model) Update(message tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case tickMsg:
-		return m, tick()
+		return m, m.tick()
 	}
 
 	return m, nil
 }
 
 func (m model) View() string {
-	return fmt.Sprint("\n\n     Hi. This this is git status\n", m)
+	return fmt.Sprint("", m.git.status, "\n", m.git.statusTs.Format(time.ANSIC))
 }

@@ -2,9 +2,15 @@ package main
 
 import (
 	"os/exec"
+	"time"
 )
 
-func runGitStatus() (string, error) {
+type git struct {
+	status   string
+	statusTs time.Time
+}
+
+func (g *git) runGitStatus() (string, error) {
 	cmd := exec.Command("git", "status")
 	output, err := cmd.CombinedOutput()
 
@@ -12,5 +18,8 @@ func runGitStatus() (string, error) {
 		return "", err
 	}
 
-	return string(output), nil
+	g.status = string(output)
+	g.statusTs = time.Now()
+
+	return g.status, nil
 }
