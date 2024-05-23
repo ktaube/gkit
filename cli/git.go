@@ -6,12 +6,13 @@ import (
 )
 
 type git struct {
+	dirpath  string
 	status   string
 	statusTs time.Time
 }
 
 func (g *git) runGitStatus() (string, error) {
-	cmd := exec.Command("git", "status")
+	cmd := exec.Command("git", "-C", g.dirpath, "status")
 	output, err := cmd.CombinedOutput()
 
 	if err != nil {

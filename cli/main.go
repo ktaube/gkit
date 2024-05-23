@@ -1,12 +1,13 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
+	lg "github.com/charmbracelet/lipgloss"
 )
 
 type model struct {
@@ -15,14 +16,16 @@ type model struct {
 type tickMsg string
 
 func main() {
+	dirpath := flag.String("dir", ".", "directory to watch")
+	flag.Parse()
 
-	git := git{}
+	git := &git{dirpath: *dirpath}
 
 	_, err := git.runGitStatus()
 	if err != nil {
 		log.Fatal(err)
 	}
-	p := tea.NewProgram(model{git: &git}, tea.WithAltScreen())
+	p := tea.NewProgram(model{git: git}, tea.WithAltScreen())
 	if _, err := p.Run(); err != nil {
 		log.Fatal(err)
 	}
@@ -58,9 +61,11 @@ func (m model) Update(message tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	var style = lipgloss.NewStyle().
+	var style = lg.NewStyle().
+		Border(lg.RoundedBorder()).
 		PaddingTop(2).
 		PaddingLeft(4).
+		Height(40).
 		Width(120)
 
 	return style.Render(fmt.Sprint("", m.git.status, "\n", m.git.statusTs.Format(time.ANSIC)))
