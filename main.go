@@ -4,10 +4,12 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
-	lg "github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/lipgloss"
+	"golang.org/x/term"
 )
 
 type model struct {
@@ -61,12 +63,19 @@ func (m model) Update(message tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	var style = lg.NewStyle().
-		Border(lg.RoundedBorder()).
-		PaddingTop(2).
-		PaddingLeft(4).
-		Height(40).
-		Width(120)
+	width, height, err := term.GetSize(int(os.Stdout.Fd()))
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	return style.Render(fmt.Sprint("", m.git.status, "\n", m.git.statusTs.Format(time.ANSIC)))
+	var style = lipgloss.NewStyle().
+		Width(width).                          // Set the width to terminal width
+		Height(height).                        // Set the height to terminal height
+		Background(lipgloss.Color("#000000")). // Set your desired background color
+		Padding(1)
+
+	// Prepare the content with "hello" at the bottom
+	content := fmt.Sprintf("%s\n%s", m.git.status, m.git.statusTs.Format(time.ANSIC))
+
+	return style.Render(content)
 }
