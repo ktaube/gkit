@@ -2,10 +2,11 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"os"
 	"time"
+
+	tree "github.com/charmbracelet/lipgloss/tree"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -14,6 +15,7 @@ import (
 
 type model struct {
 	git *git
+	ctx *ctx
 }
 type tickMsg string
 
@@ -27,7 +29,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	p := tea.NewProgram(model{git: git}, tea.WithAltScreen())
+
+	ctx := &ctx{
+		theme: getTheme(),
+	}
+
+	p := tea.NewProgram(model{git: git, ctx: ctx}, tea.WithAltScreen())
 	if _, err := p.Run(); err != nil {
 		log.Fatal(err)
 	}
@@ -69,13 +76,33 @@ func (m model) View() string {
 	}
 
 	var style = lipgloss.NewStyle().
-		Width(width).                          // Set the width to terminal width
-		Height(height).                        // Set the height to terminal height
-		Background(lipgloss.Color("#000000")). // Set your desired background color
+		Width(width).                                            // Set the width to terminal width
+		Height(height).                                          // Set the height to terminal height
+		Background(lipgloss.Color(m.ctx.theme.backgroundColor)). // Set your desired background color
 		Padding(1)
 
 	// Prepare the content with "hello" at the bottom
-	content := fmt.Sprintf("%s\n%s", m.git.status, m.git.statusTs.Format(time.ANSIC))
+	// content := fmt.Sprintf("%s\n%s", m.git.status, m.git.statusTs.Format(time.ANSIC))
 
-	return style.Render(content)
+	enumeratorStyle := lipgloss.NewStyle().
+		Padding(0, 1)
+
+
+	t := tree.New().
+		EnumeratorStyle(enumeratorStyle).
+		Root("# Table of Contents").
+		Child(
+			tree.New().
+				Root("## Chapter 1").
+				Child("Chapter 1.1").
+				Child("Chapter 1.2"),
+		).
+		Child(
+			tree.New().
+				Root("## Chapter 2").
+				Child("Chapter 2.1").
+				Child("Chapter 2.2"),
+		)
+
+	return style.Render(t.String())
 }
