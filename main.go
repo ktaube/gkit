@@ -87,7 +87,6 @@ func (m model) View() string {
 	enumeratorStyle := lipgloss.NewStyle().
 		Padding(0, 1)
 
-
 	t := tree.New().
 		EnumeratorStyle(enumeratorStyle).
 		Root("# Table of Contents").
