@@ -13,17 +13,12 @@ import (
 )
 
 type model struct {
-	git *git
 	ctx *ctx
 }
 type tickMsg string
 
 func (m model) tick() tea.Cmd {
 	return tea.Tick(time.Second, func(t time.Time) tea.Msg {
-		_, err := m.git.runGitStatus()
-		if err != nil {
-			log.Fatal(err)
-		}
 		return tickMsg("")
 	})
 }
