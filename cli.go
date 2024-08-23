@@ -54,9 +54,8 @@ func (m model) View() string {
 		Root("# Table of Contents").
 		Child(
 			tree.New().
-				Root("## Chapter 1").
-				Child("Chapter 1.1").
-				Child("Chapter 1.2"),
+				Root("## diff").
+				Child(m.ctx.diff),
 		).
 		Child(
 			tree.New().
