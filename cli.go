@@ -8,7 +8,6 @@ import (
 	tree "github.com/charmbracelet/lipgloss/tree"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 	"golang.org/x/term"
 )
 
@@ -48,17 +47,7 @@ func (m model) View() string {
 		log.Fatal(err)
 	}
 
-	var style = lipgloss.NewStyle().
-		Width(width).                                            // Set the width to terminal width
-		Height(height).                                          // Set the height to terminal height
-		Background(lipgloss.Color(m.ctx.theme.backgroundColor)). // Set your desired background color
-		Padding(1)
-
-	// Prepare the content with "hello" at the bottom
-	// content := fmt.Sprintf("%s\n%s", m.git.status, m.git.statusTs.Format(time.ANSIC))
-
-	enumeratorStyle := lipgloss.NewStyle().
-		Padding(0, 1)
+	style := getRootStyle(width, height, m.ctx.theme)
 
 	t := tree.New().
 		EnumeratorStyle(enumeratorStyle).
