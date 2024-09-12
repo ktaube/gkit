@@ -8,7 +8,6 @@ type theme struct {
 
 type ctx struct {
 	theme theme
-	diff  string
 }
 
 func getTheme() theme {

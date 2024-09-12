@@ -1,29 +1,26 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
-	"time"
 
 	tree "github.com/charmbracelet/lipgloss/tree"
+	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic"
+	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic/client/native"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"golang.org/x/term"
 )
 
 type model struct {
-	ctx *ctx
-}
-type tickMsg string
-
-func (m model) tick() tea.Cmd {
-	return tea.Tick(time.Second, func(t time.Time) tea.Msg {
-		return tickMsg("")
-	})
+	ctx           *ctx
+	diff          string
+	commitMessage string
 }
 
 func (m model) Init() tea.Cmd {
-	return m.tick()
+	return nil
 }
 
 func (m model) Update(message tea.Msg) (tea.Model, tea.Cmd) {
@@ -33,9 +30,6 @@ func (m model) Update(message tea.Msg) (tea.Model, tea.Cmd) {
 		case "q", "esc", "ctrl+c":
 			return m, tea.Quit
 		}
-
-	case tickMsg:
-		return m, m.tick()
 	}
 
 	return m, nil
@@ -55,7 +49,7 @@ func (m model) View() string {
 		Child(
 			tree.New().
 				Root("## diff").
-				Child(m.ctx.diff),
+				Child(m.diff),
 		).
 		Child(
 			tree.New().
@@ -65,4 +59,32 @@ func (m model) View() string {
 		)
 
 	return style.Render(t.String())
+}
+
+type getCommitMessageMsg string
+
+func getCommitMessage(diff string) getCommitMessageMsg {
+	ctx := context.Background()
+	client, err := native.MakeClient(native.Config{
+		APIKey: os.Getenv("ANTHROPIC_API_KEY"),
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	request := anthropic.NewMessageRequest(
+		[]anthropic.MessagePartRequest{
+			{Role: "system", Content: []anthropic.ContentBlock{anthropic.NewTextContentBlock("You are a helpful assistant that generates commit messages for a git diff.")}},
+			{Role: "user", Content: []anthropic.ContentBlock{anthropic.NewTextContentBlock(diff)}},
+		},
+		anthropic.WithModel[anthropic.MessageRequest](anthropic.Claude35Sonnet),
+		anthropic.WithMaxTokens[anthropic.MessageRequest](20),
+	)
+
+	response, err := client.Message(ctx, request)
+	if err != nil {
+		panic(err)
+	}
+
+	return getCommitMessageMsg(response.Content[0].Text)
 }
